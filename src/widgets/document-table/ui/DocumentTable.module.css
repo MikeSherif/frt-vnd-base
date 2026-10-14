@@ -20,6 +20,17 @@ td {
 .pdf { flex: none; margin-top: 2px; }
 .title { color: #1d4e9e; font-weight: 650; text-decoration: none; line-height: 1.35; }
 .date { white-space: nowrap; }
-.icon { width: 36px; text-align: center; }
-.icon a { color: #1d4e9e; text-decoration: none; font-size: 18px; }
+.icon { width: 40px; text-align: center; }
+.icon a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  color: #1d4e9e;
+  text-decoration: none;
+  transition: background 0.16s ease, color 0.16s ease;
+}
+.icon a:hover { background: #eef3fb; color: #163e80; }
 .muted { color: #c5ced8; }

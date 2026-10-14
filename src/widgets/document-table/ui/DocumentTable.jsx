@@ -5,6 +5,15 @@ import { FavoriteButton } from '../../../features/toggle-favorite'
 import { COLUMNS } from '../model/columns.js'
 import styles from './DocumentTable.module.css'
 
+function DownloadIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true">
+      <path d="M10 3v8.2M6.7 8.4 10 11.8l3.3-3.4" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M4.2 13.2v2.1a1.2 1.2 0 0 0 1.2 1.2h9.2a1.2 1.2 0 0 0 1.2-1.2v-2.1" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  )
+}
+
 function PdfMark() {
   return (
     <svg className={styles.pdf} width="28" height="32" viewBox="0 0 28 32" aria-hidden="true">
@@ -50,7 +59,7 @@ export function DocumentTable({ rows, today, sort, sortDir, onSort }) {
                 <td>{labelOf(RELEVANCE, document.relevance)}</td>
                 <td className={styles.icon}>
                   {file?.url ? (
-                    <a href={file.url} download={file.name} aria-label={`Скачать ${document.shortTitle || 'документ'}`}>↓</a>
+                    <a href={file.url} download={file.name} title="Скачать" aria-label={`Скачать ${document.shortTitle || 'документ'}`}><DownloadIcon /></a>
                   ) : <span className={styles.muted}>—</span>}
                 </td>
                 <td className={styles.icon}>

@@ -12,8 +12,16 @@
   border: 1px solid #d9e0ea;
   border-radius: 20px;
   background: #fff;
+  cursor: text;
+  transition: border-color 0.16s ease, box-shadow 0.16s ease;
+}
+.search:has(input:focus) {
+  border-color: #1d4e9e;
+  box-shadow: 0 0 0 3px rgba(29, 78, 158, 0.1);
 }
 .search input { flex: 1; min-width: 0; border: 0; background: transparent; outline: none; color: #1b2433; }
+.search input:focus,
+.search input:focus-visible { outline: none; box-shadow: none; }
 .search input::placeholder { color: #b0b8c4; }
 .lens { display: flex; color: #9aa3b2; }
 .clear, .filter, .filterOn { border: 0; background: none; padding: 0; display: flex; align-items: center; }

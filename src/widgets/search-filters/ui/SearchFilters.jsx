@@ -33,7 +33,14 @@ export function SearchFilters({ filters, onChange, leading, trailing }) {
     <div className={styles.tools}>
       <div className={styles.toolbar}>
         {leading}
-        <div className={styles.search}>
+        <div
+          className={styles.search}
+          onMouseDown={(event) => {
+            if (event.target.closest('button, input')) return
+            event.preventDefault()
+            event.currentTarget.querySelector('input')?.focus()
+          }}
+        >
           <span className={styles.lens} aria-hidden="true">
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
               <circle cx="7" cy="7" r="4.5" stroke="currentColor" strokeWidth="1.5" />

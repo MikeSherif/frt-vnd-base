@@ -39,7 +39,7 @@ export function DatePicker({
   }
 
   return (
-    <div className={[styles.root, compact ? styles.compact : ''].filter(Boolean).join(' ')} ref={rootRef}>
+    <div className={[styles.root, compact ? styles.compact : '', open ? styles.open : ''].filter(Boolean).join(' ')} ref={rootRef}>
       <div className={styles.control}>
         <button
           type="button"

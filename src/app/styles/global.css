@@ -40,6 +40,16 @@ button { cursor: pointer; }
   line-height: 1.2;
   font-weight: 650;
   white-space: nowrap;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease;
+}
+.vnd-btn:not(.secondary):not(.ghost):hover {
+  background: #e07d14;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 14px rgba(239, 139, 34, 0.28);
+}
+.vnd-btn:not(.secondary):not(.ghost):active {
+  transform: translateY(0);
+  box-shadow: none;
 }
 .vnd-btn.secondary {
   background: #fff;
@@ -55,4 +65,7 @@ button { cursor: pointer; }
 .vnd-btn:focus-visible, button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
   outline: 2px solid #1d4e9e;
   outline-offset: 2px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .vnd-btn:not(.secondary):not(.ghost):hover { transform: none; }
 }

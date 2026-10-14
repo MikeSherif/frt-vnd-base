@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" fill="none" style="color:#1f4b8f">
+  <path class="doc" fill="currentColor" d="M14 6h24l12 12v36a4 4 0 0 1-4 4H14a4 4 0 0 1-4-4V10a4 4 0 0 1 4-4z"/>
+  <path class="fold" fill="#fff" fill-opacity=".35" d="M38 6l12 12h-8a4 4 0 0 1-4-4z"/>
+  <g class="lines" stroke="var(--icon-bg,#fff)" stroke-width="3" stroke-linecap="round">
+    <path class="line line-1" d="M18 24h24"/>
+    <path class="line line-2" d="M18 31h24"/>
+    <path class="line line-3" d="M18 38h16"/>
+    <path class="line line-4" d="M18 45h10"/>
+  </g>
+  <g class="pencil" stroke-linejoin="round">
+    <path class="pencil-outline" d="M38 59L40.8 50.6 55.2 36.2 60.8 41.8 46.4 56.2z" fill="var(--icon-bg,#fff)" stroke="var(--icon-bg,#fff)" stroke-width="4"/>
+    <path class="pencil-body" d="M38 59L40.8 50.6 55.2 36.2 60.8 41.8 46.4 56.2z" fill="currentColor"/>
+    <path class="pencil-band" d="M51.6 39.8l5.6 5.6" stroke="var(--icon-bg,#fff)" stroke-width="1.6"/>
+    <path class="pencil-tip" d="M40.8 50.6l5.6 5.6" stroke="var(--icon-bg,#fff)" stroke-width="1.6"/>
+  </g>
+</svg>

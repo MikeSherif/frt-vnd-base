@@ -20,6 +20,18 @@ function optionsOf(list, labelKey = 'label') {
   return list.map((item) => ({ id: item.id, label: item[labelKey] }))
 }
 
+function FileField({ label, hint, name, onPick }) {
+  return (
+    <Field className={styles.fileField} label={label} hint={hint}>
+      <span className={styles.file}>
+        <input type="file" onChange={(event) => onPick(event.target.files?.[0])} />
+        <span className={styles.fileBtn}>Выбрать файл</span>
+        <span className={name ? styles.fileName : styles.fileEmpty}>{name || 'Файл не выбран'}</span>
+      </span>
+    </Field>
+  )
+}
+
 function blankRevision(number) {
   return {
     id: crypto.randomUUID(),
@@ -126,12 +138,18 @@ export function DocumentForm({ value, documents, onChange }) {
               <label><input type="checkbox" checked={revision.incomplete} onChange={(event) => updateRevision(revision.id, { incomplete: event.target.checked })} /> Неполная запись</label>
             </div>
             <Field label="Причина неполноты"><input value={revision.incompleteReason || ''} onChange={(event) => updateRevision(revision.id, { incompleteReason: event.target.value })} /></Field>
-            <Field label="Основной файл" hint={revision.file?.name || 'PDF, DOCX, Excel или изображение до 50 МБ'}>
-              <input type="file" onChange={(event) => attach(revision.id, 'file', event.target.files?.[0])} />
-            </Field>
-            <Field label="Файл основания" hint={revision.basisFile?.name || 'Обязателен для полной редакции'}>
-              <input type="file" onChange={(event) => attach(revision.id, 'basisFile', event.target.files?.[0])} />
-            </Field>
+            <FileField
+              label="Основной файл"
+              hint="PDF, DOCX, Excel или изображение до 50 МБ"
+              name={revision.file?.name}
+              onPick={(file) => attach(revision.id, 'file', file)}
+            />
+            <FileField
+              label="Файл основания"
+              hint="Обязателен для полной редакции"
+              name={revision.basisFile?.name}
+              onPick={(file) => attach(revision.id, 'basisFile', file)}
+            />
             {revision.locked ? <p>Опубликованная редакция не удаляется.</p> : (
               <Button variant="ghost" onClick={() => update({ revisions: withoutItem(value.revisions, revision.id) })}>Удалить редакцию</Button>
             )}

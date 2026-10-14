@@ -5,4 +5,58 @@
 .checks { display: flex; flex-wrap: wrap; gap: 12px; }
 .error { color: var(--vnd-danger); }
 .wide { grid-column: 1 / -1; }
-@media (max-width: 900px) { .grid, .row { grid-template-columns: 1fr; } }
+.fileField { grid-column: span 2; }
+.file {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 40px;
+  padding: 4px 10px 4px 4px;
+  border: 1px solid var(--vnd-line);
+  border-radius: 8px;
+  background: #fff;
+  cursor: pointer;
+  transition: border-color 0.16s ease, box-shadow 0.16s ease, background 0.16s ease;
+}
+.file:hover { border-color: #c5d4ee; background: #f8fbff; }
+.file:focus-within {
+  border-color: #1d4e9e;
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(29, 78, 158, 0.1);
+}
+.form .file input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+  border-radius: 0;
+}
+.form .file input:focus,
+.form .file input:focus-visible { outline: none; }
+.fileBtn {
+  flex: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  background: #eef3fb;
+  color: #1d4e9e;
+  font-size: 13px;
+  font-weight: 650;
+}
+.fileName, .fileEmpty {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 13px;
+}
+.fileName { color: #1b2433; }
+.fileEmpty { color: #8b95a5; }
+@media (max-width: 900px) {
+  .grid, .row { grid-template-columns: 1fr; }
+  .fileField { grid-column: auto; }
+}
