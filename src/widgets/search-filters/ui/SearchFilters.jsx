@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Chip } from '../../../shared/chip'
 import { DatePicker } from '../../../shared/date-picker'
 import { Field } from '../../../shared/field'
@@ -22,6 +22,46 @@ const EMPTY_FIELDS = {
 
 function asOptions(list, labelKey = 'label') {
   return list.map((item) => ({ id: item.id, label: item[labelKey] }))
+}
+
+function FilterReveal({ open, children }) {
+  const [present, setPresent] = useState(false)
+  const [settled, setSettled] = useState(false)
+  const node = useRef(null)
+  const reduced = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+  useEffect(() => {
+    if (!open) return undefined
+    setPresent(true)
+    setSettled(reduced())
+    return undefined
+  }, [open])
+
+  useEffect(() => {
+    if (open || !present || !reduced()) return undefined
+    setPresent(false)
+    setSettled(false)
+    return undefined
+  }, [open, present])
+
+  if (!present) return null
+
+  return (
+    <div
+      ref={node}
+      className={[styles.reveal, open ? styles.revealIn : styles.revealOut, settled ? styles.revealSettled : ''].filter(Boolean).join(' ')}
+      onAnimationEnd={(event) => {
+        if (event.target !== node.current) return
+        if (open) setSettled(true)
+        else {
+          setPresent(false)
+          setSettled(false)
+        }
+      }}
+    >
+      <div className={styles.revealClip}>{children}</div>
+    </div>
+  )
 }
 
 export function SearchFilters({ filters, onChange, leading, trailing }) {
@@ -71,7 +111,7 @@ export function SearchFilters({ filters, onChange, leading, trailing }) {
         </div>
         <div className={styles.trailing}>{trailing}</div>
       </div>
-      {open ? (
+      <FilterReveal open={open}>
         <div className={styles.panel}>
           <div className={styles.panelHead}>
             <span>Фильтр</span>
@@ -111,7 +151,7 @@ export function SearchFilters({ filters, onChange, leading, trailing }) {
             <DatePicker ariaLabel="Опубликован по" value={filters.publishedTo} onChange={(publishedTo) => onChange({ publishedTo })} />
           </Field>
         </div>
-      ) : null}
+      </FilterReveal>
       {chips.length ? (
         <div className={styles.chips}>
           {chips.map((chip) => (
