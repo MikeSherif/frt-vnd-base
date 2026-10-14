@@ -1,7 +1,8 @@
 import { shiftIso } from '../../../shared/lib/dates.js'
 
-const SAMPLE_PDF = '/samples/lab1.pdf'
-const APPENDIX = '/samples/appendix.xlsx'
+const publicFile = (name) => `${import.meta.env.BASE_URL}${name}`
+const SAMPLE_PDF = publicFile('samples/lab1.pdf')
+const APPENDIX = publicFile('samples/appendix.xlsx')
 
 function pdfFile(id, name, hash = `hash-${id}`) {
   return {
