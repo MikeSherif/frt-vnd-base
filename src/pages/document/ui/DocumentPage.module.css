@@ -1,0 +1,18 @@
+.layout { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 22px; margin-top: 20px; }
+.side {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  border-left: 1px solid #e3e8ef;
+}
+.side > section {
+  padding: 16px 0 18px 18px;
+  border-bottom: 1px solid #e6ebf2;
+}
+.side > section:first-child { padding-top: 0; }
+.side > section:last-child { border-bottom: 0; padding-bottom: 0; }
+.side h2 { margin: 0 0 12px; }
+.warning { margin: 8px 0 0; color: #8d2d2d; }
+.files { margin: 10px 0 0; padding-left: 18px; color: #5e6878; }
+.files a { color: #1d4e9e; }
+@media (max-width: 980px) { .layout { grid-template-columns: 1fr; } }

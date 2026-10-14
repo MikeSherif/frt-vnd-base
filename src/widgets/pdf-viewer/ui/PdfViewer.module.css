@@ -1,0 +1,35 @@
+.frame { min-height: 420px; background: #eef1f5; border-radius: 4px; }
+.fallback { padding: 24px; color: #5e6878; }
+.body { display: grid; grid-template-columns: 108px minmax(0, 1fr); min-height: 520px; }
+.thumbs {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 12px 8px;
+  overflow: auto;
+  max-height: 760px;
+  background: #e7ebf1;
+}
+.thumb, .thumbOn {
+  width: 84px;
+  border: 2px solid transparent;
+  background: #fff;
+  padding: 4px;
+  color: #5e6878;
+  font-size: 12px;
+}
+.thumbOn { border-color: #e2b423; }
+.thumb canvas, .thumbOn canvas { display: block; height: auto; }
+.stage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 12px 12px;
+  overflow: auto;
+  background: #f4f6f8;
+}
+.stage canvas { box-shadow: 0 8px 24px rgba(20, 40, 80, 0.12); background: #fff; }
+.zoom { display: flex; align-items: center; gap: 10px; color: #5e6878; font-size: 13px; }
+.zoom button { border: 0; background: #fff; color: #1d4e9e; border-radius: 6px; padding: 4px 8px; }
+@media (max-width: 720px) { .body { grid-template-columns: 1fr; } .thumbs { flex-direction: row; max-height: none; } }

@@ -1,0 +1,20 @@
+.card h2 {
+  margin: 0 0 10px;
+  color: #1d4e9e;
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.list li {
+  display: grid;
+  grid-template-columns: 92px minmax(0, 1fr);
+  gap: 8px;
+  padding: 8px 0;
+  border-bottom: 1px solid #f0f3f7;
+  font-size: 13px;
+}
+.list li:last-child { border-bottom: 0; padding-bottom: 0; }
+.done { color: #1d4e9e; }
+.future { color: #9aa3b2; }
+.card p { margin: 0; color: #8b95a5; font-size: 13px; }

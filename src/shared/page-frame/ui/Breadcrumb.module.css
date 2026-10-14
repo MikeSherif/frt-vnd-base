@@ -1,0 +1,4 @@
+.crumbs { color: #8b95a5; font-size: 13px; }
+.crumbs a { color: #8b95a5; text-decoration: none; }
+.crumbs a:hover { color: #1d4e9e; }
+.sep { margin: 0 6px; }

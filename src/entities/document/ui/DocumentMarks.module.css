@@ -1,0 +1,15 @@
+.mark {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  background: #f3efe8;
+  color: var(--vnd-ink);
+}
+.active { background: #e5f4ec; color: var(--vnd-green); }
+.archived { background: #eceae6; color: var(--vnd-past); }
+.checked { background: #e7f2f8; color: var(--vnd-accent); }
+.unchecked { background: #f3efe8; color: var(--vnd-muted); }
+.needs_review, .needs_change { background: #f8efd9; color: var(--vnd-warn); }

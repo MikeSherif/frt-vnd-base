@@ -1,0 +1,25 @@
+.scroll { overflow-x: auto; }
+.table { width: 100%; border-collapse: collapse; min-width: 860px; }
+th {
+  background: #f3f5f8;
+  color: #8b95a5;
+  font-size: 13px;
+  font-weight: 650;
+  text-align: left;
+  padding: 11px 12px;
+}
+th button { border: 0; background: none; color: inherit; font-weight: 650; padding: 0; }
+td {
+  padding: 16px 12px;
+  border-bottom: 1px solid #eef1f5;
+  vertical-align: middle;
+  color: #243044;
+  font-size: 14px;
+}
+.doc { display: flex; gap: 10px; align-items: flex-start; }
+.pdf { flex: none; margin-top: 2px; }
+.title { color: #1d4e9e; font-weight: 650; text-decoration: none; line-height: 1.35; }
+.date { white-space: nowrap; }
+.icon { width: 36px; text-align: center; }
+.icon a { color: #1d4e9e; text-decoration: none; font-size: 18px; }
+.muted { color: #c5ced8; }

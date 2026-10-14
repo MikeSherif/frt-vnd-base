@@ -1,0 +1,2 @@
+.switcher { display: flex; align-items: center; gap: 8px; font-size: 12px; color: #8b95a5; }
+.switcher > div { min-width: 240px; }

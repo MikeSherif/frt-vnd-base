@@ -1,0 +1,58 @@
+:root {
+  color: #1b2433;
+  background: #eef2f6;
+  font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  line-height: 1.45;
+  --vnd-bg: #eef2f6;
+  --vnd-paper: #ffffff;
+  --vnd-ink: #1b2433;
+  --vnd-muted: #8b95a5;
+  --vnd-line: #e3e8ef;
+  --vnd-navy: #1d4e9e;
+  --vnd-accent: #1d4e9e;
+  --vnd-accent-soft: #eef3fb;
+  --vnd-green: #1f6b45;
+  --vnd-warn: #8a5a12;
+  --vnd-danger: #8d2d2d;
+  --vnd-past: #9aa3b2;
+  --vnd-shadow: 0 8px 24px rgba(27, 45, 80, 0.04);
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; background: #eef2f6; }
+button, input, select, textarea { font: inherit; color: inherit; }
+h1, h2, h3, p { margin: 0; }
+a { color: var(--vnd-accent); }
+button { cursor: pointer; }
+
+.vnd-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 36px;
+  padding: 8px 16px;
+  border-radius: 20px;
+  border: 1px solid transparent;
+  background: #ef8b22;
+  color: white;
+  text-decoration: none;
+  line-height: 1.2;
+  font-weight: 650;
+  white-space: nowrap;
+}
+.vnd-btn.secondary {
+  background: #fff;
+  color: #1d4e9e;
+  border-color: #d5dce6;
+  border-radius: 8px;
+}
+.vnd-btn.ghost {
+  background: transparent;
+  color: #1d4e9e;
+}
+.vnd-btn:disabled { opacity: 0.55; cursor: not-allowed; }
+.vnd-btn:focus-visible, button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+  outline: 2px solid #1d4e9e;
+  outline-offset: 2px;
+}

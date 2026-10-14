@@ -1,0 +1,6 @@
+.panel { display: flex; flex-direction: column; gap: 12px; padding: 16px; border: 1px solid var(--vnd-line); border-radius: 12px; background: #fbf7f1; }
+.errors, .warnings { margin: 0; padding-left: 18px; }
+.errors { color: var(--vnd-danger); }
+.warnings { color: var(--vnd-warn); }
+.actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.confirm { display: flex; gap: 8px; align-items: flex-start; }

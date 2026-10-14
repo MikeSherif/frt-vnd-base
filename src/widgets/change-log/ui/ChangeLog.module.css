@@ -1,0 +1,17 @@
+.card { display: flex; }
+.open {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  border: 0;
+  background: none;
+  color: #1d4e9e;
+  padding: 0;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.open::after { content: '→'; margin-left: auto; font-weight: 500; }
+.table { width: 100%; border-collapse: collapse; }
+.table th, .table td { text-align: left; padding: 8px; border-bottom: 1px solid var(--vnd-line); vertical-align: top; }

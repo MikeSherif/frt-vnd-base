@@ -1,0 +1,2 @@
+.page { display: flex; flex-direction: column; gap: 18px; }
+.page h2 { color: #1d4e9e; font-size: 20px; }

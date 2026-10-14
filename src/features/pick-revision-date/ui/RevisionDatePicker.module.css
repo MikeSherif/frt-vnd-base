@@ -1,0 +1,14 @@
+.box {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px solid #e6ebf2;
+  color: #8b95a5;
+  font-size: 13px;
+}
+.box input { border: 1px solid #d5dce6; border-radius: 8px; padding: 4px 8px; background: white; color: #243044; }
+.reason { color: #8d2d2d; }
+.grounds { color: #243044; }

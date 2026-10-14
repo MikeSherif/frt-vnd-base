@@ -1,0 +1,16 @@
+.page { display: flex; flex-direction: column; gap: 14px; }
+.page h1 {
+  margin: 0;
+  font-size: 28px;
+  line-height: 1.2;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: #1a1f2b;
+}
+.sheet {
+  background: #fff;
+  border-radius: 6px;
+  padding: 22px 22px 20px;
+  box-shadow: 0 1px 2px rgba(20, 40, 80, 0.04);
+  min-height: 560px;
+}

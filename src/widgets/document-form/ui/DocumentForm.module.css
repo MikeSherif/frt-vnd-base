@@ -1,0 +1,8 @@
+.form { display: flex; flex-direction: column; gap: 20px; }
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.block { display: flex; flex-direction: column; gap: 12px; padding: 16px; border: 1px solid var(--vnd-line); border-radius: 12px; background: var(--vnd-paper); }
+.row { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; align-items: end; padding-bottom: 12px; border-bottom: 1px solid var(--vnd-line); }
+.checks { display: flex; flex-wrap: wrap; gap: 12px; }
+.error { color: var(--vnd-danger); }
+.wide { grid-column: 1 / -1; }
+@media (max-width: 900px) { .grid, .row { grid-template-columns: 1fr; } }

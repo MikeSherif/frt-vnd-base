@@ -1,0 +1,10 @@
+.box {
+  padding: 28px;
+  border: 1px dashed var(--vnd-line);
+  border-radius: 12px;
+  background: var(--vnd-paper);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: flex-start;
+}

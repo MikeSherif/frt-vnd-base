@@ -1,0 +1,21 @@
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(16, 40, 63, 0.45);
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 48px 16px;
+  z-index: 20;
+}
+.dialog {
+  width: min(960px, 100%);
+  max-height: calc(100vh - 96px);
+  overflow: auto;
+  background: var(--vnd-paper);
+  border-radius: 14px;
+  padding: 20px;
+  box-shadow: var(--vnd-shadow);
+}
+.head { display: flex; justify-content: space-between; gap: 12px; align-items: center; margin-bottom: 16px; }
+.head button { border: 0; background: transparent; font-size: 22px; }

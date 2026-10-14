@@ -1,0 +1,10 @@
+.card { display: flex; flex-direction: column; gap: 10px; color: #243044; font-size: 14px; }
+.card h2 {
+  margin: 0;
+  color: #1d4e9e;
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.card span { color: #1d4e9e; }
+.card p { margin: 0; line-height: 1.45; }

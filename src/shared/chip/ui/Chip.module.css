@@ -1,0 +1,18 @@
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px 4px 10px;
+  border-radius: 999px;
+  background: var(--vnd-accent-soft);
+  color: var(--vnd-navy);
+  font-size: 13px;
+}
+.chip button {
+  border: 0;
+  background: transparent;
+  color: var(--vnd-accent);
+  padding: 0 2px;
+  font-size: 16px;
+  line-height: 1;
+}

@@ -1,0 +1,4 @@
+.wrap { display: inline-flex; align-items: center; gap: 8px; }
+.link { border: 0; background: none; color: #1d4e9e; padding: 0; white-space: nowrap; }
+.link:disabled { opacity: 0.55; }
+.error { color: #8d2d2d; font-size: 13px; }
