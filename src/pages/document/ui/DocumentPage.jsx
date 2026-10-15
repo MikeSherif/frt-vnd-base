@@ -1,11 +1,9 @@
-import { AboutDocument } from '../../../widgets/about-document'
 import { ChangeLog } from '../../../widgets/change-log'
 import { DocumentHeader } from '../../../widgets/document-header'
 import { PdfViewer } from '../../../widgets/pdf-viewer'
 import { RelatedLinks } from '../../../widgets/related-links'
 import { RelevanceTimeline } from '../../../widgets/relevance-timeline'
 import { RevisionList } from '../../../widgets/revision-list'
-import { RevisionDatePicker } from '../../../features/pick-revision-date'
 import { PageFrame, vndCrumbs } from '../../../shared/page-frame'
 import { useDocumentView } from '../model/useDocumentView.js'
 import styles from './DocumentPage.module.css'
@@ -30,7 +28,6 @@ export function DocumentPage() {
         onBack={view.goHome}
         editTo={view.canEdit ? `/admin/documents/${view.document.id}` : null}
       />
-      <RevisionDatePicker value={view.onDate} onChange={view.selectDate} resolution={view.resolution} />
       {view.duplicates.length ? (
         <ul className={styles.warning}>
           {view.duplicates.map((warning) => <li key={warning}>{warning}</li>)}
@@ -38,11 +35,7 @@ export function DocumentPage() {
       ) : null}
       <div className={styles.layout}>
         <div>
-          {view.onDate && !view.shown ? (
-            <p className={styles.warning}>{view.resolution?.reason}</p>
-          ) : (
-            <PdfViewer file={file} />
-          )}
+          <PdfViewer file={file} />
           {view.shown?.attachments?.length ? (
             <ul className={styles.files}>
               {view.shown.attachments.map((attachment) => (
@@ -55,7 +48,6 @@ export function DocumentPage() {
           ) : null}
         </div>
         <aside className={styles.side}>
-          <AboutDocument summary={view.document.summary} keywords={view.document.keywords} />
           <RevisionList
             revisions={view.document.revisions}
             currentId={view.currentId}

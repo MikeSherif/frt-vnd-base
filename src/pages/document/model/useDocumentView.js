@@ -27,18 +27,10 @@ export function useDocumentView() {
   const user = useSession()
   const today = todayIso()
   const source = state.documents.find((item) => item.id === id) ?? null
-  const onDate = params.get('onDate') ?? ''
   const revisionParam = params.get('revision') ?? ''
-  const resolution = source && onDate ? resolveRevision(source.revisions, onDate) : null
   const current = source ? resolveRevision(source.revisions, today).revision : null
   const explicit = source && revisionParam ? revisionById(source, revisionParam) : null
-
-  let shown = null
-  if (source) {
-    if (onDate) shown = resolution?.revision ?? null
-    else if (explicit) shown = explicit
-    else shown = displayRevision(source, today)
-  }
+  const shown = source ? (explicit ?? displayRevision(source, today)) : null
 
   const document = useMemo(() => {
     if (!source) return null
@@ -80,13 +72,6 @@ export function useDocumentView() {
   function selectRevision(revisionId) {
     const next = new URLSearchParams(params)
     next.set('revision', revisionId)
-    next.delete('onDate')
-    setParams(next)
-  }
-
-  function selectDate(date) {
-    const next = new URLSearchParams()
-    if (date) next.set('onDate', date)
     setParams(next)
   }
 
@@ -94,11 +79,8 @@ export function useDocumentView() {
     document,
     shown,
     currentId: current?.id ?? null,
-    onDate,
-    resolution,
     goHome,
     selectRevision,
-    selectDate,
     functionRows,
     documentRows,
     duplicates: source ? findDuplicateFiles(source, state.documents) : [],
