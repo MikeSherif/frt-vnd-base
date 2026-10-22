@@ -9,6 +9,7 @@ export function PublishDocument({
   notice,
   dateChangeNeeded,
   dateChangeConfirmed,
+  dateError = '',
   onDateChangeConfirmed,
   onSaveDraft,
   onPublish,
@@ -32,6 +33,7 @@ export function PublishDocument({
           <input
             type="checkbox"
             checked={dateChangeConfirmed}
+            aria-invalid={dateError ? true : undefined}
             onChange={(event) => onDateChangeConfirmed(event.target.checked)}
           />
           <span>Подтверждаю исправление опубликованной даты. История периодов будет пересчитана, изменение попадёт в журнал.</span>

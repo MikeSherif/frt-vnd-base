@@ -13,7 +13,8 @@ import {
   resolveRevision,
   revisionById,
   STATUSES,
-  useVndState,
+  useDocument,
+  useDocumentList,
   VND_LINK_ROLES,
 } from '../../../entities/document'
 import { useSession } from '../../../entities/session'
@@ -23,10 +24,10 @@ export function useDocumentView() {
   const { id } = useParams()
   const [params, setParams] = useSearchParams()
   const navigate = useNavigate()
-  const state = useVndState()
+  const { data: source } = useDocument(id)
+  const { data: documents = [] } = useDocumentList()
   const user = useSession()
   const today = todayIso()
-  const source = state.documents.find((item) => item.id === id) ?? null
   const revisionParam = params.get('revision') ?? ''
   const current = source ? resolveRevision(source.revisions, today).revision : null
   const explicit = source && revisionParam ? revisionById(source, revisionParam) : null
@@ -52,7 +53,7 @@ export function useDocumentView() {
   }))
 
   const documentRows = (source?.documentLinks ?? []).map((link) => {
-    const target = state.documents.find((item) => item.id === link.targetId && item.published)
+    const target = documents.find((item) => item.id === link.targetId && item.published)
     const revision = target?.revisions.find((item) => item.number === Number(link.targetRevision))
     return {
       id: link.id,
@@ -83,7 +84,7 @@ export function useDocumentView() {
     selectRevision,
     functionRows,
     documentRows,
-    duplicates: source ? findDuplicateFiles(source, state.documents) : [],
+    duplicates: source ? findDuplicateFiles(source, documents) : [],
     canEdit: user.role === 'docflow',
     hidden: Boolean(source && !source.published && user.role !== 'docflow'),
     missing: !source,

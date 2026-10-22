@@ -1,4 +1,4 @@
-import { useVndState } from '../../../entities/document'
+import { useDocuments } from '../../../entities/document'
 import { useSession } from '../../../entities/session'
 import { todayIso } from '../../../shared/date-text'
 import { EmptyState } from '../../../shared/empty-state'
@@ -8,9 +8,9 @@ import { favoriteDocuments } from '../model/favoriteDocuments.js'
 import styles from './FavoritesPage.module.css'
 
 export function FavoritesPage() {
-  const state = useVndState()
+  const { data: bundle } = useDocuments()
   const user = useSession()
-  const rows = favoriteDocuments(state.documents, user.id)
+  const rows = favoriteDocuments(bundle?.documents ?? [], user.id, bundle?.favorites ?? {})
   return (
     <PageFrame crumbs={[{ label: 'Главная страница', to: '/' }, { label: 'База знаний', to: '/' }, { label: 'Избранное' }]}>
       <h2 className={styles.title}>Избранное</h2>

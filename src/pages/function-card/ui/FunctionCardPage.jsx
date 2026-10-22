@@ -1,13 +1,13 @@
 import { Link, useParams } from 'react-router-dom'
-import { useVndState } from '../../../entities/document'
+import { useDocumentList } from '../../../entities/document'
 import { PageFrame } from '../../../shared/page-frame'
 import { useFunctionCard } from '../model/useFunctionCard.js'
 import styles from './FunctionCardPage.module.css'
 
 export function FunctionCardPage() {
   const { id } = useParams()
-  const state = useVndState()
-  const { item, links } = useFunctionCard(id, state.documents)
+  const { data: documents = [] } = useDocumentList()
+  const { item, links } = useFunctionCard(id, documents)
   if (!item) {
     return (
       <PageFrame crumbs={[{ label: 'Главная страница', to: '/' }, { label: 'База знаний', to: '/' }, { label: 'Каталог функций', to: '/functions' }]}>

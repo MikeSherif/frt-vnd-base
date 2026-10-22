@@ -1,9 +1,9 @@
 import { Link } from 'react-router-dom'
 import {
   filterDocuments,
-  getMetrics,
   sortDocuments,
-  useVndState,
+  useDocumentList,
+  useMetrics,
 } from '../../../entities/document'
 import { useSession } from '../../../entities/session'
 import { todayIso } from '../../../shared/date-text'
@@ -24,11 +24,11 @@ import styles from './CatalogPage.module.css'
 
 export function CatalogPage() {
   const { filters, setFilters, reset, selectPreset } = useCatalogFilters()
-  const state = useVndState()
+  const { data: documents = [] } = useDocumentList()
+  const { data: metrics } = useMetrics()
   const user = useSession()
   const today = todayIso()
-  const metrics = getMetrics()
-  const filtered = sortDocuments(filterDocuments(state.documents, filters, today), filters, today)
+  const filtered = sortDocuments(filterDocuments(documents, filters, today), filters, today)
   const start = (filters.page - 1) * filters.pageSize
   const rows = filtered.slice(start, start + filters.pageSize)
   const narrowed = filtersAreNarrowed(filters)
@@ -43,7 +43,7 @@ export function CatalogPage() {
 
   return (
     <PageFrame crumbs={vndCrumbs(true)}>
-      <MetricsBar metrics={metrics} preset={filters.preset} onSelect={selectPreset} />
+      {metrics ? <MetricsBar metrics={metrics} preset={filters.preset} onSelect={selectPreset} /> : null}
       <SearchFilters
         filters={filters}
         onChange={setFilters}

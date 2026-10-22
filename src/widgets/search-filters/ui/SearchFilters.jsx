@@ -24,6 +24,18 @@ function asOptions(list, labelKey = 'label') {
   return list.map((item) => ({ id: item.id, label: item[labelKey] }))
 }
 
+function FilterField({ label, children }) {
+  return (
+    <Field label={label} control="composite">
+      {(a11y) => children({
+        labelledBy: a11y.labelledBy,
+        describedBy: a11y.describedBy,
+        invalid: a11y.invalid,
+      })}
+    </Field>
+  )
+}
+
 function FilterReveal({ open, children }) {
   const [present, setPresent] = useState(false)
   const [settled, setSettled] = useState(false)
@@ -117,39 +129,39 @@ export function SearchFilters({ filters, onChange, leading, trailing }) {
             <span>Фильтр</span>
             <button type="button" onClick={() => onChange(EMPTY_FIELDS)}>Очистить</button>
           </div>
-          <Field label="Статус">
-            <Select multiple placeholder="Все статусы" value={filters.status} options={asOptions(STATUSES)} onChange={(status) => onChange({ status })} />
-          </Field>
-          <Field label="Актуальность">
-            <Select multiple placeholder="Любая" value={filters.relevance} options={asOptions(RELEVANCE)} onChange={(relevance) => onChange({ relevance })} />
-          </Field>
-          <Field label="Функция">
-            <Select multiple placeholder="Все функции" value={filters.functionIds} options={asOptions(FUNCTIONS, 'name')} onChange={(functionIds) => onChange({ functionIds })} />
-          </Field>
-          <Field label="Вид ВНД">
-            <Select multiple placeholder="Все виды" value={filters.kind} options={asOptions(DOCUMENT_KINDS)} onChange={(kind) => onChange({ kind })} />
-          </Field>
-          <Field label="Владелец ВНД">
-            <Select multiple placeholder="Все подразделения" value={filters.owner} options={asOptions(DEPARTMENTS, 'name')} onChange={(owner) => onChange({ owner })} />
-          </Field>
-          <Field label="Владелец процесса">
-            <Select multiple placeholder="Все подразделения" value={filters.processOwner} options={asOptions(DEPARTMENTS, 'name')} onChange={(processOwner) => onChange({ processOwner })} />
-          </Field>
-          <Field label="Принят с">
-            <DatePicker ariaLabel="Принят с" value={filters.adoptedFrom} onChange={(adoptedFrom) => onChange({ adoptedFrom })} />
-          </Field>
-          <Field label="Принят по">
-            <DatePicker ariaLabel="Принят по" value={filters.adoptedTo} onChange={(adoptedTo) => onChange({ adoptedTo })} />
-          </Field>
-          <Field label="Действовал на дату">
-            <DatePicker ariaLabel="Действовал на дату" value={filters.onDate} onChange={(onDate) => onChange({ onDate })} />
-          </Field>
-          <Field label="Опубликован с">
-            <DatePicker ariaLabel="Опубликован с" value={filters.publishedFrom} onChange={(publishedFrom) => onChange({ publishedFrom })} />
-          </Field>
-          <Field label="Опубликован по">
-            <DatePicker ariaLabel="Опубликован по" value={filters.publishedTo} onChange={(publishedTo) => onChange({ publishedTo })} />
-          </Field>
+          <FilterField label="Статус">
+            {(field) => <Select {...field} multiple placeholder="Все статусы" value={filters.status} options={asOptions(STATUSES)} onChange={(status) => onChange({ status })} />}
+          </FilterField>
+          <FilterField label="Актуальность">
+            {(field) => <Select {...field} multiple placeholder="Любая" value={filters.relevance} options={asOptions(RELEVANCE)} onChange={(relevance) => onChange({ relevance })} />}
+          </FilterField>
+          <FilterField label="Функция">
+            {(field) => <Select {...field} multiple placeholder="Все функции" value={filters.functionIds} options={asOptions(FUNCTIONS, 'name')} onChange={(functionIds) => onChange({ functionIds })} />}
+          </FilterField>
+          <FilterField label="Вид ВНД">
+            {(field) => <Select {...field} multiple placeholder="Все виды" value={filters.kind} options={asOptions(DOCUMENT_KINDS)} onChange={(kind) => onChange({ kind })} />}
+          </FilterField>
+          <FilterField label="Владелец ВНД">
+            {(field) => <Select {...field} multiple placeholder="Все подразделения" value={filters.owner} options={asOptions(DEPARTMENTS, 'name')} onChange={(owner) => onChange({ owner })} />}
+          </FilterField>
+          <FilterField label="Владелец процесса">
+            {(field) => <Select {...field} multiple placeholder="Все подразделения" value={filters.processOwner} options={asOptions(DEPARTMENTS, 'name')} onChange={(processOwner) => onChange({ processOwner })} />}
+          </FilterField>
+          <FilterField label="Принят с">
+            {(field) => <DatePicker {...field} ariaLabel="Принят с" value={filters.adoptedFrom} onChange={(adoptedFrom) => onChange({ adoptedFrom })} />}
+          </FilterField>
+          <FilterField label="Принят по">
+            {(field) => <DatePicker {...field} ariaLabel="Принят по" value={filters.adoptedTo} onChange={(adoptedTo) => onChange({ adoptedTo })} />}
+          </FilterField>
+          <FilterField label="Действовал на дату">
+            {(field) => <DatePicker {...field} ariaLabel="Действовал на дату" value={filters.onDate} onChange={(onDate) => onChange({ onDate })} />}
+          </FilterField>
+          <FilterField label="Опубликован с">
+            {(field) => <DatePicker {...field} ariaLabel="Опубликован с" value={filters.publishedFrom} onChange={(publishedFrom) => onChange({ publishedFrom })} />}
+          </FilterField>
+          <FilterField label="Опубликован по">
+            {(field) => <DatePicker {...field} ariaLabel="Опубликован по" value={filters.publishedTo} onChange={(publishedTo) => onChange({ publishedTo })} />}
+          </FilterField>
         </div>
       </FilterReveal>
       {chips.length ? (

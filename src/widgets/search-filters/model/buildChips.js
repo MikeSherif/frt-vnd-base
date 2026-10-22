@@ -17,12 +17,12 @@ export function buildChips(filters) {
   if (filters.preset !== 'all') chips.push({ id: 'preset', label: labelOf(PRESETS, filters.preset), patch: { preset: 'all' } })
   filters.status.forEach((id) => chips.push({
     id: `status-${id}`,
-    label: labelOf(STATUSES, id),
+    label: `Статус: ${labelOf(STATUSES, id)}`,
     patch: { status: filters.status.filter((item) => item !== id) },
   }))
   filters.kind.forEach((id) => chips.push({
     id: `kind-${id}`,
-    label: labelOf(DOCUMENT_KINDS, id),
+    label: `Вид ВНД: ${labelOf(DOCUMENT_KINDS, id)}`,
     patch: { kind: filters.kind.filter((item) => item !== id) },
   }))
   filters.owner.forEach((id) => chips.push({
@@ -37,12 +37,12 @@ export function buildChips(filters) {
   }))
   filters.relevance.forEach((id) => chips.push({
     id: `relevance-${id}`,
-    label: labelOf(RELEVANCE, id),
+    label: `Актуальность: ${labelOf(RELEVANCE, id)}`,
     patch: { relevance: filters.relevance.filter((item) => item !== id) },
   }))
   filters.functionIds.forEach((id) => chips.push({
     id: `function-${id}`,
-    label: functionName(id),
+    label: `Функция: ${functionName(id)}`,
     patch: { functionIds: filters.functionIds.filter((item) => item !== id) },
   }))
   if (filters.adoptedFrom || filters.adoptedTo) {

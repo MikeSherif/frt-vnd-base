@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Controller, useFieldArray, useFormContext, useWatch } from 'react-hook-form'
 import {
   DEPARTMENTS,
   DOCUMENT_KINDS,
@@ -13,23 +14,11 @@ import { Button } from '../../../shared/button'
 import { DatePicker } from '../../../shared/date-picker'
 import { Field } from '../../../shared/field'
 import { Select } from '../../../shared/select'
-import { readFileMeta, withItem, withoutItem } from '../model/readFileMeta.js'
+import { readFileMeta } from '../model/readFileMeta.js'
 import styles from './DocumentForm.module.css'
 
 function optionsOf(list, labelKey = 'label') {
   return list.map((item) => ({ id: item.id, label: item[labelKey] }))
-}
-
-function FileField({ label, hint, name, onPick }) {
-  return (
-    <Field className={styles.fileField} label={label} hint={hint}>
-      <span className={styles.file}>
-        <input type="file" onChange={(event) => onPick(event.target.files?.[0])} />
-        <span className={styles.fileBtn}>Выбрать файл</span>
-        <span className={name ? styles.fileName : styles.fileEmpty}>{name || 'Файл не выбран'}</span>
-      </span>
-    </Field>
-  )
 }
 
 function blankRevision(number) {
@@ -51,56 +40,160 @@ function blankRevision(number) {
   }
 }
 
-export function DocumentForm({ value, documents, onChange }) {
+function inputProps(field) {
+  return {
+    id: field.id,
+    'aria-invalid': field['aria-invalid'],
+    'aria-describedby': field['aria-describedby'],
+  }
+}
+
+function compositeProps(field) {
+  return {
+    labelledBy: field.labelledBy,
+    describedBy: field.describedBy,
+    invalid: field.invalid,
+  }
+}
+
+function TextInput({ label, hint, name, type = 'text', error, disabled = false, className = '', rules }) {
+  const { register } = useFormContext()
+  return (
+    <Field className={className} label={label} hint={hint} error={error}>
+      {(field) => (
+        <input
+          {...register(name, rules)}
+          {...inputProps(field)}
+          type={type}
+          disabled={disabled}
+        />
+      )}
+    </Field>
+  )
+}
+
+function SelectInput({ label, name, options, error, disabled = false, placeholder, clearable = false }) {
+  const { control } = useFormContext()
+  return (
+    <Field label={label} error={error} control="composite">
+      {(field) => (
+        <Controller
+          name={name}
+          control={control}
+          render={({ field: input }) => (
+            <Select
+              {...compositeProps(field)}
+              placeholder={placeholder}
+              clearable={clearable}
+              disabled={disabled}
+              value={input.value ?? ''}
+              options={options}
+              onChange={input.onChange}
+            />
+          )}
+        />
+      )}
+    </Field>
+  )
+}
+
+function DateInput({ label, name, error }) {
+  const { control } = useFormContext()
+  return (
+    <Field label={label} error={error} control="composite">
+      {(field) => (
+        <Controller
+          name={name}
+          control={control}
+          render={({ field: input }) => (
+            <DatePicker
+              {...compositeProps(field)}
+              ariaLabel={label}
+              value={input.value || ''}
+              onChange={input.onChange}
+            />
+          )}
+        />
+      )}
+    </Field>
+  )
+}
+
+function FileInput({ label, hint, error, name, onPick }) {
+  return (
+    <Field className={styles.fileField} label={label} hint={hint} error={error}>
+      {(field) => (
+        <span className={styles.file}>
+          <input
+            {...inputProps(field)}
+            type="file"
+            onChange={(event) => onPick(event.target.files?.[0])}
+          />
+          <span className={styles.fileBtn}>Выбрать файл</span>
+          <span className={name ? styles.fileName : styles.fileEmpty}>{name || 'Файл не выбран'}</span>
+        </span>
+      )}
+    </Field>
+  )
+}
+
+export function DocumentForm({ documents }) {
+  const { control, register, setValue, formState: { errors } } = useFormContext()
   const [fileError, setFileError] = useState('')
+  const revisions = useWatch({ control, name: 'revisions' })
+  const events = useWatch({ control, name: 'relevanceEvents' })
+  const functionLinks = useWatch({ control, name: 'functionLinks' })
+  const documentLinks = useWatch({ control, name: 'documentLinks' })
+  const documentId = useWatch({ control, name: 'id' })
+  const revisionFields = useFieldArray({ control, name: 'revisions', keyName: 'fieldKey' })
+  const eventFields = useFieldArray({ control, name: 'relevanceEvents', keyName: 'fieldKey' })
+  const functionFields = useFieldArray({ control, name: 'functionLinks', keyName: 'fieldKey' })
+  const linkFields = useFieldArray({ control, name: 'documentLinks', keyName: 'fieldKey' })
+  const others = documents.filter((document) => document.id !== documentId && document.published)
+  const numberRule = { setValueAs: (value) => (value === '' || value == null ? 0 : Number(value)) }
 
-  function update(patch) {
-    onChange({ ...value, ...patch })
-  }
-
-  function updateRevision(id, patch) {
-    update({ revisions: withItem(value.revisions, id, patch) })
-  }
-
-  async function attach(id, key, file) {
+  async function attach(index, key, file) {
     if (!file) return
     setFileError('')
     try {
-      updateRevision(id, { [key]: await readFileMeta(file) })
+      setValue(`revisions.${index}.${key}`, await readFileMeta(file), { shouldDirty: true })
     } catch (error) {
       setFileError(error.message)
     }
   }
-
-  const others = documents.filter((document) => document.id !== value.id && document.published)
 
   return (
     <form className={styles.form} onSubmit={(event) => event.preventDefault()}>
       <section className={styles.block}>
         <h2>Реквизиты</h2>
         <div className={styles.grid}>
-          <Field label="Краткое наименование"><input value={value.shortTitle} onChange={(event) => update({ shortTitle: event.target.value })} /></Field>
-          <Field label="Номер ВНД"><input value={value.number} onChange={(event) => update({ number: event.target.value })} /></Field>
-          <Field label="Полное наименование" className={styles.wide}>
-            <input value={value.fullTitle} onChange={(event) => update({ fullTitle: event.target.value })} />
-          </Field>
-          <Field label="Вид документа">
-            <Select placeholder="Выберите" clearable value={value.kind} options={optionsOf(DOCUMENT_KINDS)} onChange={(kind) => update({ kind })} />
-          </Field>
-          <Field label="Статус">
-            <Select value={value.status} options={optionsOf(STATUSES)} onChange={(status) => update({ status })} />
-          </Field>
-          <Field label="Актуальность">
-            <Select value={value.relevance} options={optionsOf(RELEVANCE)} onChange={(relevance) => update({ relevance })} />
-          </Field>
-          <Field label="Дата принятия"><DatePicker ariaLabel="Дата принятия" value={value.adoptedAt || ''} onChange={(adoptedAt) => update({ adoptedAt })} /></Field>
-          <Field label="Дата публикации"><DatePicker ariaLabel="Дата публикации" value={value.publishedAt || ''} onChange={(publishedAt) => update({ publishedAt })} /></Field>
-          <Field label="Дата следующей проверки"><DatePicker ariaLabel="Дата следующей проверки" value={value.nextCheckAt || ''} onChange={(nextCheckAt) => update({ nextCheckAt })} /></Field>
-          <Field label="Орган управления, принявший документ"><input value={value.governingBody} onChange={(event) => update({ governingBody: event.target.value })} /></Field>
-          <Field label="Вид документа принятия"><input value={value.adoptionDocKind} onChange={(event) => update({ adoptionDocKind: event.target.value })} /></Field>
-          <Field label="Реквизиты документа принятия"><input value={value.adoptionDocDetails} onChange={(event) => update({ adoptionDocDetails: event.target.value })} /></Field>
-          <Field label="Ключевые слова" hint="Через запятую, по ним тоже ищет реестр">
-            <input value={(value.keywords ?? []).join(', ')} onChange={(event) => update({ keywords: event.target.value.split(',').map((item) => item.trim()) })} />
+          <TextInput label="Краткое наименование" name="shortTitle" error={errors.shortTitle?.message} />
+          <TextInput label="Номер ВНД" name="number" error={errors.number?.message} />
+          <TextInput label="Полное наименование" name="fullTitle" className={styles.wide} error={errors.fullTitle?.message} />
+          <SelectInput label="Вид документа" name="kind" placeholder="Выберите" clearable options={optionsOf(DOCUMENT_KINDS)} error={errors.kind?.message} />
+          <SelectInput label="Статус" name="status" options={optionsOf(STATUSES)} error={errors.status?.message} />
+          <SelectInput label="Актуальность" name="relevance" options={optionsOf(RELEVANCE)} error={errors.relevance?.message} />
+          <DateInput label="Дата принятия" name="adoptedAt" error={errors.adoptedAt?.message} />
+          <DateInput label="Дата публикации" name="publishedAt" error={errors.publishedAt?.message} />
+          <DateInput label="Дата следующей проверки" name="nextCheckAt" error={errors.nextCheckAt?.message} />
+          <TextInput label="Орган управления, принявший документ" name="governingBody" />
+          <TextInput label="Вид документа принятия" name="adoptionDocKind" />
+          <TextInput label="Реквизиты документа принятия" name="adoptionDocDetails" />
+          <Field label="Ключевые слова" hint="Через запятую, по ним тоже ищет реестр" error={errors.keywords?.message}>
+            {(field) => (
+              <Controller
+                name="keywords"
+                control={control}
+                render={({ field: input }) => (
+                  <input
+                    {...inputProps(field)}
+                    value={(input.value ?? []).join(', ')}
+                    onChange={(event) => input.onChange(event.target.value.split(',').map((item) => item.trim()))}
+                    onBlur={input.onBlur}
+                  />
+                )}
+              />
+            )}
           </Field>
         </div>
       </section>
@@ -108,113 +201,124 @@ export function DocumentForm({ value, documents, onChange }) {
       <section className={styles.block}>
         <h2>Владельцы</h2>
         <div className={styles.grid}>
-          <Field label="Владелец ВНД">
-            <Select placeholder="Не назначен" clearable value={value.ownerDeptId} options={optionsOf(DEPARTMENTS, 'name')} onChange={(ownerDeptId) => update({ ownerDeptId })} />
-          </Field>
-          <Field label="Владелец процесса">
-            <Select placeholder="Не назначен" clearable value={value.processOwnerDeptId} options={optionsOf(DEPARTMENTS, 'name')} onChange={(processOwnerDeptId) => update({ processOwnerDeptId })} />
-          </Field>
-          <Field label="Ответственный"><input value={value.responsible} onChange={(event) => update({ responsible: event.target.value })} /></Field>
+          <SelectInput label="Владелец ВНД" name="ownerDeptId" placeholder="Не назначен" clearable options={optionsOf(DEPARTMENTS, 'name')} error={errors.ownerDeptId?.message} />
+          <SelectInput label="Владелец процесса" name="processOwnerDeptId" placeholder="Не назначен" clearable options={optionsOf(DEPARTMENTS, 'name')} />
+          <TextInput label="Ответственный" name="responsible" error={errors.responsible?.message} />
         </div>
       </section>
 
       <section className={styles.block}>
         <h2>Редакции и файлы</h2>
         {fileError ? <p className={styles.error}>{fileError}</p> : null}
+        {errors.root?.mainFile?.message ? <p className={styles.error}>{errors.root.mainFile.message}</p> : null}
         <label className={styles.checks}>
-          <input type="checkbox" checked={value.overlapConfirmed} onChange={(event) => update({ overlapConfirmed: event.target.checked })} />
+          <input type="checkbox" aria-invalid={errors.overlapConfirmed ? true : undefined} {...register('overlapConfirmed')} />
           Пересечение периодов подтверждаю
         </label>
-        {value.revisions.map((revision) => (
-          <div key={revision.id} className={styles.row}>
-            <Field label="Номер редакции"><input type="number" value={revision.number} onChange={(event) => updateRevision(revision.id, { number: Number(event.target.value) })} /></Field>
-            <Field label="Действует с"><DatePicker ariaLabel="Действует с" value={revision.effectiveFrom || ''} onChange={(effectiveFrom) => updateRevision(revision.id, { effectiveFrom })} /></Field>
-            <Field label="Действует по"><DatePicker ariaLabel="Действует по" value={revision.effectiveTo || ''} onChange={(effectiveTo) => updateRevision(revision.id, { effectiveTo })} /></Field>
-            <Field label="Дата публикации редакции"><DatePicker ariaLabel="Дата публикации редакции" value={revision.publishedAt || ''} onChange={(publishedAt) => updateRevision(revision.id, { publishedAt })} /></Field>
-            <Field label="Основание"><input value={revision.basisDetails || ''} onChange={(event) => updateRevision(revision.id, { basisDetails: event.target.value })} /></Field>
-            <div className={styles.checks}>
-              <label><input type="checkbox" checked={revision.confirmedStart} onChange={(event) => updateRevision(revision.id, { confirmedStart: event.target.checked })} /> Начало подтверждено</label>
-              <label><input type="checkbox" checked={revision.isSubstantive} onChange={(event) => updateRevision(revision.id, { isSubstantive: event.target.checked })} /> Содержательная</label>
-              <label><input type="checkbox" checked={revision.incomplete} onChange={(event) => updateRevision(revision.id, { incomplete: event.target.checked })} /> Неполная запись</label>
+        {errors.overlapConfirmed?.message ? <p className={styles.error}>{errors.overlapConfirmed.message}</p> : null}
+        {revisionFields.fields.map((field, index) => {
+          const revision = revisions?.[index] ?? {}
+          const revisionErrors = errors.revisions?.[index] ?? {}
+          return (
+            <div key={field.fieldKey} className={styles.row}>
+              <TextInput label="Номер редакции" name={`revisions.${index}.number`} type="number" rules={numberRule} />
+              <DateInput label="Действует с" name={`revisions.${index}.effectiveFrom`} />
+              <DateInput label="Действует по" name={`revisions.${index}.effectiveTo`} error={revisionErrors.effectiveTo?.message} />
+              <DateInput label="Дата публикации редакции" name={`revisions.${index}.publishedAt`} />
+              <TextInput label="Основание" name={`revisions.${index}.basisDetails`} />
+              <div className={styles.checks}>
+                <label><input type="checkbox" {...register(`revisions.${index}.confirmedStart`)} /> Начало подтверждено</label>
+                <label><input type="checkbox" {...register(`revisions.${index}.isSubstantive`)} /> Содержательная</label>
+                <label><input type="checkbox" {...register(`revisions.${index}.incomplete`)} /> Неполная запись</label>
+              </div>
+              <TextInput label="Причина неполноты" name={`revisions.${index}.incompleteReason`} error={revisionErrors.incompleteReason?.message} />
+              <FileInput
+                label="Основной файл"
+                hint="PDF, DOCX, Excel или изображение до 50 МБ"
+                name={revision.file?.name}
+                error={revisionErrors.file?.message}
+                onPick={(file) => attach(index, 'file', file)}
+              />
+              <FileInput
+                label="Файл основания"
+                hint="Обязателен для полной редакции"
+                name={revision.basisFile?.name}
+                error={revisionErrors.basisFile?.message}
+                onPick={(file) => attach(index, 'basisFile', file)}
+              />
+              {revision.locked ? <p>Опубликованная редакция не удаляется.</p> : (
+                <Button variant="ghost" onClick={() => revisionFields.remove(index)}>Удалить редакцию</Button>
+              )}
             </div>
-            <Field label="Причина неполноты"><input value={revision.incompleteReason || ''} onChange={(event) => updateRevision(revision.id, { incompleteReason: event.target.value })} /></Field>
-            <FileField
-              label="Основной файл"
-              hint="PDF, DOCX, Excel или изображение до 50 МБ"
-              name={revision.file?.name}
-              onPick={(file) => attach(revision.id, 'file', file)}
-            />
-            <FileField
-              label="Файл основания"
-              hint="Обязателен для полной редакции"
-              name={revision.basisFile?.name}
-              onPick={(file) => attach(revision.id, 'basisFile', file)}
-            />
-            {revision.locked ? <p>Опубликованная редакция не удаляется.</p> : (
-              <Button variant="ghost" onClick={() => update({ revisions: withoutItem(value.revisions, revision.id) })}>Удалить редакцию</Button>
-            )}
-          </div>
-        ))}
-        <Button variant="secondary" onClick={() => update({ revisions: [...value.revisions, blankRevision(value.revisions.length + 1)] })}>Добавить редакцию</Button>
+          )
+        })}
+        <Button variant="secondary" onClick={() => revisionFields.append(blankRevision((revisions?.length ?? 0) + 1))}>Добавить редакцию</Button>
       </section>
 
       <section className={styles.block}>
         <h2>Актуализация</h2>
-        {(value.relevanceEvents ?? []).map((event) => (
-          <div key={event.id} className={styles.row}>
-            <Field label="Дата">
-              <DatePicker ariaLabel="Дата события" value={event.date || ''} onChange={(date) => update({ relevanceEvents: withItem(value.relevanceEvents, event.id, { date }) })} />
-            </Field>
-            <Field label="Событие">
-              <Select value={event.type} options={optionsOf(RELEVANCE_EVENT_TYPES)} onChange={(type) => update({ relevanceEvents: withItem(value.relevanceEvents, event.id, { type }) })} />
-            </Field>
-            <Field label="Кто проверил"><input value={event.checker || ''} onChange={(eventInput) => update({ relevanceEvents: withItem(value.relevanceEvents, event.id, { checker: eventInput.target.value }) })} /></Field>
-            <Field label="Комментарий"><input value={event.comment || ''} onChange={(eventInput) => update({ relevanceEvents: withItem(value.relevanceEvents, event.id, { comment: eventInput.target.value }) })} /></Field>
-            <label><input type="checkbox" checked={Boolean(event.completed)} onChange={(eventInput) => update({ relevanceEvents: withItem(value.relevanceEvents, event.id, { completed: eventInput.target.checked }) })} /> Выполнено</label>
-            {event.locked ? null : <Button variant="ghost" onClick={() => update({ relevanceEvents: withoutItem(value.relevanceEvents, event.id) })}>Удалить</Button>}
-          </div>
-        ))}
-        <Button variant="secondary" onClick={() => update({ relevanceEvents: [...(value.relevanceEvents ?? []), { id: crypto.randomUUID(), date: '', type: 'planned_check', completed: false, checker: '', comment: '', locked: false }] })}>Добавить событие</Button>
+        {eventFields.fields.map((field, index) => {
+          const event = events?.[index] ?? {}
+          return (
+            <div key={field.fieldKey} className={styles.row}>
+              <DateInput label="Дата" name={`relevanceEvents.${index}.date`} />
+              <SelectInput label="Событие" name={`relevanceEvents.${index}.type`} options={optionsOf(RELEVANCE_EVENT_TYPES)} />
+              <TextInput label="Кто проверил" name={`relevanceEvents.${index}.checker`} />
+              <TextInput label="Комментарий" name={`relevanceEvents.${index}.comment`} />
+              <label><input type="checkbox" {...register(`relevanceEvents.${index}.completed`)} /> Выполнено</label>
+              {event.locked ? null : <Button variant="ghost" onClick={() => eventFields.remove(index)}>Удалить</Button>}
+            </div>
+          )
+        })}
+        <Button
+          variant="secondary"
+          onClick={() => eventFields.append({ id: crypto.randomUUID(), date: '', type: 'planned_check', completed: false, checker: '', comment: '', locked: false })}
+        >
+          Добавить событие
+        </Button>
       </section>
 
       <section className={styles.block}>
         <h2>Связь с функцией</h2>
-        {(value.functionLinks ?? []).map((link) => (
-          <div key={`${link.functionId}-${link.role}`} className={styles.row}>
-            <Field label="Функция">
-              <Select disabled={link.locked} value={link.functionId} options={optionsOf(FUNCTIONS, 'name')} onChange={(functionId) => update({ functionLinks: value.functionLinks.map((item) => item === link ? { ...item, functionId } : item) })} />
-            </Field>
-            <Field label="Роль">
-              <Select disabled={link.locked} value={link.role} options={optionsOf(FUNCTION_ROLES)} onChange={(role) => update({ functionLinks: value.functionLinks.map((item) => item === link ? { ...item, role } : item) })} />
-            </Field>
-            {link.locked ? null : <Button variant="ghost" onClick={() => update({ functionLinks: value.functionLinks.filter((item) => item !== link) })}>Удалить</Button>}
-          </div>
-        ))}
-        <Button variant="secondary" onClick={() => update({ functionLinks: [...(value.functionLinks ?? []), { functionId: FUNCTIONS[0].id, role: 'executes', locked: false }] })}>Добавить функцию</Button>
+        {functionFields.fields.map((field, index) => {
+          const link = functionLinks?.[index] ?? {}
+          return (
+            <div key={field.fieldKey} className={styles.row}>
+              <SelectInput label="Функция" name={`functionLinks.${index}.functionId`} disabled={link.locked} options={optionsOf(FUNCTIONS, 'name')} />
+              <SelectInput label="Роль" name={`functionLinks.${index}.role`} disabled={link.locked} options={optionsOf(FUNCTION_ROLES)} />
+              {link.locked ? null : <Button variant="ghost" onClick={() => functionFields.remove(index)}>Удалить</Button>}
+            </div>
+          )
+        })}
+        <Button variant="secondary" onClick={() => functionFields.append({ functionId: FUNCTIONS[0].id, role: 'executes', locked: false })}>Добавить функцию</Button>
       </section>
 
       <section className={styles.block}>
         <h2>Связь с ВНД</h2>
-        {(value.documentLinks ?? []).map((link) => (
-          <div key={link.id} className={styles.row}>
-            <Field label="Документ">
-              <Select
+        {linkFields.fields.map((field, index) => {
+          const link = documentLinks?.[index] ?? {}
+          return (
+            <div key={field.fieldKey} className={styles.row}>
+              <SelectInput
+                label="Документ"
+                name={`documentLinks.${index}.targetId`}
                 disabled={link.locked}
                 placeholder="Выберите"
                 clearable
-                value={link.targetId}
                 options={others.map((document) => ({ id: document.id, label: `${document.number} ${document.shortTitle}` }))}
-                onChange={(targetId) => update({ documentLinks: withItem(value.documentLinks, link.id, { targetId }) })}
               />
-            </Field>
-            <Field label="Редакция"><input type="number" value={link.targetRevision ?? ''} disabled={link.locked} onChange={(event) => update({ documentLinks: withItem(value.documentLinks, link.id, { targetRevision: Number(event.target.value) }) })} /></Field>
-            <Field label="Роль">
-              <Select disabled={link.locked} value={link.role} options={optionsOf(VND_LINK_ROLES)} onChange={(role) => update({ documentLinks: withItem(value.documentLinks, link.id, { role }) })} />
-            </Field>
-            {link.locked ? null : <Button variant="ghost" onClick={() => update({ documentLinks: withoutItem(value.documentLinks, link.id) })}>Удалить</Button>}
-          </div>
-        ))}
-        <Button variant="secondary" onClick={() => update({ documentLinks: [...(value.documentLinks ?? []), { id: crypto.randomUUID(), targetId: '', targetRevision: 1, role: 'references', locked: false }] })}>Добавить связь</Button>
+              <TextInput label="Редакция" name={`documentLinks.${index}.targetRevision`} type="number" rules={numberRule} disabled={link.locked} />
+              <SelectInput label="Роль" name={`documentLinks.${index}.role`} disabled={link.locked} options={optionsOf(VND_LINK_ROLES)} />
+              {link.locked ? null : <Button variant="ghost" onClick={() => linkFields.remove(index)}>Удалить</Button>}
+            </div>
+          )
+        })}
+        <Button
+          variant="secondary"
+          onClick={() => linkFields.append({ id: crypto.randomUUID(), targetId: '', targetRevision: 1, role: 'references', locked: false })}
+        >
+          Добавить связь
+        </Button>
       </section>
     </form>
   )

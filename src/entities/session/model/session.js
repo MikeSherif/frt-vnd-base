@@ -1,52 +1,45 @@
-import { useSyncExternalStore } from 'react'
-
-export const USERS = {
-  docflow: { id: 'user-docflow', name: 'Сергеева Анна', role: 'docflow', roleLabel: 'Документооборот' },
-  reader: { id: 'user-reader', name: 'Морозов Илья', role: 'reader', roleLabel: 'Сотрудник' },
-}
+import { create } from 'zustand'
+import { USERS } from './users.js'
 
 const STORAGE_KEY = 'vnd-kb-session'
-const listeners = new Set()
 
-function readUser() {
+function readRole() {
   try {
     const role = localStorage.getItem(STORAGE_KEY)
-    if (role && USERS[role]) return USERS[role]
+    if (role && USERS[role]) return role
   } catch {
-    return USERS.docflow
+    return 'docflow'
   }
-  return USERS.docflow
+  return 'docflow'
 }
 
-let currentUser = typeof localStorage === 'undefined' ? USERS.docflow : readUser()
-
-function subscribe(listener) {
-  listeners.add(listener)
-  return () => listeners.delete(listener)
-}
-
-function emit(user) {
-  currentUser = user
-  try {
-    localStorage.setItem(STORAGE_KEY, user.role)
-  } catch {
-    // Роль останется в памяти вкладки.
-  }
-  listeners.forEach((listener) => listener())
-}
+export const useSessionStore = create((set) => ({
+  role: typeof localStorage === 'undefined' ? 'docflow' : readRole(),
+  setRole(role) {
+    const next = USERS[role] ? role : 'docflow'
+    try {
+      localStorage.setItem(STORAGE_KEY, next)
+    } catch {
+      // Роль останется в памяти вкладки.
+    }
+    set({ role: next })
+  },
+}))
 
 export function getCurrentUser() {
-  return currentUser
+  const role = useSessionStore.getState().role
+  return USERS[role] ?? USERS.docflow
 }
 
 export function setRole(role) {
-  emit(USERS[role] ?? USERS.docflow)
+  useSessionStore.getState().setRole(role)
 }
 
 export function resetSession() {
-  emit(USERS.docflow)
+  setRole('docflow')
 }
 
 export function useSession() {
-  return useSyncExternalStore(subscribe, getCurrentUser, getCurrentUser)
+  const role = useSessionStore((state) => state.role)
+  return USERS[role] ?? USERS.docflow
 }

@@ -20,11 +20,3 @@ export async function readFileMeta(file) {
     isSignedOriginal: extension === 'pdf',
   }
 }
-
-export function withItem(list, id, patch) {
-  return list.map((item) => (item.id === id ? { ...item, ...patch } : item))
-}
-
-export function withoutItem(list, id) {
-  return list.filter((item) => item.id !== id)
-}

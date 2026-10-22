@@ -1,7 +1,10 @@
-import { resetDemo } from '../../../entities/document'
+import { useResetDocuments } from '../../../entities/document'
 import { resetSession } from '../../../entities/session'
 
-export function resetPortalDemo() {
-  resetDemo()
-  resetSession()
+export function useResetPortal() {
+  const resetDocuments = useResetDocuments()
+  return () => {
+    resetDocuments()
+    resetSession()
+  }
 }

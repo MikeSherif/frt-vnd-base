@@ -12,6 +12,7 @@
   color: #1b2433;
   transition: border-color 0.16s ease, box-shadow 0.16s ease;
 }
+.invalid { border-color: var(--vnd-danger); }
 .control:hover { border-color: #1d4e9e; box-shadow: 0 0 0 3px rgba(29, 78, 158, 0.08); }
 .open .control { border-color: #1d4e9e; box-shadow: 0 0 0 3px rgba(29, 78, 158, 0.1); }
 .control:has(.face:disabled),

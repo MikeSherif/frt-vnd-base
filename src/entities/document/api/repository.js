@@ -1,9 +1,7 @@
-import { useSyncExternalStore } from 'react'
-import { departmentName, labelOf, RELEVANCE, STATUSES } from './dictionaries.js'
-import { SEED_VERSION, buildSeed } from './seed.js'
-import { computeMetrics } from './metrics.js'
-import { validatePublication, findDuplicateFiles } from './validate.js'
-import { assertRules } from './assertRules.js'
+import { departmentName, labelOf, RELEVANCE, STATUSES } from '../model/dictionaries.js'
+import { SEED_VERSION, buildSeed } from '../model/seed.js'
+import { validatePublication, findDuplicateFiles } from '../model/validate.js'
+import { assertRules } from '../model/assertRules.js'
 
 const STORAGE_KEY = 'vnd-kb-v1'
 const sessionFiles = new Map()
@@ -99,8 +97,6 @@ function readStorage() {
 }
 
 let state = typeof localStorage === 'undefined' ? createState() : readStorage() ?? createState()
-const listeners = new Set()
-let metricsCache = null
 
 function persist() {
   try {
@@ -116,41 +112,21 @@ function persist() {
 
 function emit(next) {
   state = next
-  metricsCache = null
   persist()
-  listeners.forEach((listener) => listener())
 }
 
-function subscribe(listener) {
-  listeners.add(listener)
-  return () => listeners.delete(listener)
-}
-
-export function getState() {
+export function readBundle() {
   return state
-}
-
-export function useVndState() {
-  return useSyncExternalStore(subscribe, getState, getState)
 }
 
 export function resetDemo() {
   sessionFiles.clear()
   emit(createState())
+  return state
 }
 
 export function getDocument(id) {
   return state.documents.find((document) => document.id === id) ?? null
-}
-
-export function getMetrics(now = new Date()) {
-  const stamp = state.documents.map((document) => `${document.id}:${document.version}`).join('|')
-  if (metricsCache && metricsCache.stamp === stamp && now.getTime() - metricsCache.at < 5 * 60 * 1000) {
-    return metricsCache.value
-  }
-  const value = computeMetrics(state.documents, now)
-  metricsCache = { stamp, at: now.getTime(), value }
-  return value
 }
 
 function blankToNull(value) {
@@ -283,10 +259,11 @@ export function toggleFavorite(userId, documentId) {
     ...state,
     favorites: { ...state.favorites, [userId]: toggleId(current, documentId) },
   })
+  return state
 }
 
 export function isFavorite(userId, documentId, source = state) {
-  return (source.favorites[userId] ?? []).includes(documentId)
+  return (source.favorites?.[userId] ?? []).includes(documentId)
 }
 
 export function toggleSubscription(userId, target) {
@@ -299,10 +276,11 @@ export function toggleSubscription(userId, target) {
     ...state,
     subscriptions: { ...state.subscriptions, [userId]: next },
   })
+  return state
 }
 
 export function isSubscribed(userId, target, source = state) {
-  const current = source.subscriptions[userId] ?? { section: false, documents: [] }
+  const current = source.subscriptions?.[userId] ?? { section: false, documents: [] }
   if (target === 'section') return current.section
   return current.documents.includes(target)
 }

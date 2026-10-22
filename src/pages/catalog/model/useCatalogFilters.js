@@ -1,43 +1,28 @@
-import { useEffect, useMemo } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { EMPTY_FILTERS, parseFilters, serializeFilters } from '../../../entities/document'
+import { useCatalogFilterStore } from './catalogFilterStore.js'
 
 export function useCatalogFilters() {
   const [params, setParams] = useSearchParams()
   const search = params.toString()
-  const filters = useMemo(() => parseFilters(new URLSearchParams(search)), [search])
+  const storedSearch = useCatalogFilterStore((state) => state.search)
+  const storedFilters = useCatalogFilterStore((state) => state.filters)
 
-  useEffect(() => {
-    const search = params.toString()
-    sessionStorage.setItem('vnd-catalog-search', search ? `/vnd?${search}` : '/vnd')
-  }, [params])
+  if (storedSearch !== search) {
+    useCatalogFilterStore.getState().syncFromUrl(search)
+  }
+
+  const filters = storedSearch === search ? storedFilters : useCatalogFilterStore.getState().filters
 
   function setFilters(patch) {
-    const next = { ...filters, ...patch }
-    if (!Object.prototype.hasOwnProperty.call(patch, 'page')) next.page = 1
-    setParams(serializeFilters(next))
+    useCatalogFilterStore.getState().setFilters(patch, setParams)
   }
 
   function reset() {
-    setParams(serializeFilters(EMPTY_FILTERS))
+    useCatalogFilterStore.getState().reset(setParams)
   }
 
   function selectPreset(preset) {
-    setFilters({
-      q: '',
-      preset,
-      status: [],
-      kind: [],
-      owner: [],
-      processOwner: [],
-      relevance: [],
-      functionIds: [],
-      adoptedFrom: '',
-      adoptedTo: '',
-      publishedFrom: '',
-      publishedTo: '',
-      onDate: '',
-    })
+    useCatalogFilterStore.getState().selectPreset(preset, setParams)
   }
 
   return { filters, setFilters, reset, selectPreset }

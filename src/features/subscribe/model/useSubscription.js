@@ -1,13 +1,14 @@
-import { isSubscribed, toggleSubscription, useVndState } from '../../../entities/document'
+import { useIsSubscribed, useToggleSubscription } from '../../../entities/document'
 import { useSession } from '../../../entities/session'
 
 export function useSubscription(target) {
   const user = useSession()
-  const state = useVndState()
+  const subscription = useIsSubscribed(user.id, target)
+  const toggleSubscription = useToggleSubscription()
   return {
-    active: isSubscribed(user.id, target, state),
+    active: Boolean(subscription.data),
     toggle() {
-      toggleSubscription(user.id, target)
+      toggleSubscription.mutate({ userId: user.id, target })
     },
   }
 }

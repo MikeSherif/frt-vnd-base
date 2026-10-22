@@ -54,45 +54,51 @@ export function publishedDatesChanged(previous, next) {
   return previousRanges.join('|') !== nextRanges.join('|')
 }
 
-export function validatePublication(document, { dateChangeConfirmed = false, previous = null } = {}) {
-  const errors = []
-  if (!document.fullTitle?.trim()) errors.push('Укажите полное название')
-  if (!document.kind) errors.push('Укажите вид документа')
-  if (!document.adoptedAt) errors.push('Укажите дату принятия')
-  if (!document.ownerDeptId) errors.push('Укажите владельца ВНД')
-  if (!document.responsible?.trim()) errors.push('Укажите ответственного')
+export function publicationIssues(document, { dateChangeConfirmed = false, previous = null } = {}) {
+  const issues = []
+  const add = (path, message) => issues.push({ path, message })
+
+  if (!document.fullTitle?.trim()) add('fullTitle', 'Укажите полное название')
+  if (!document.kind) add('kind', 'Укажите вид документа')
+  if (!document.adoptedAt) add('adoptedAt', 'Укажите дату принятия')
+  if (!document.ownerDeptId) add('ownerDeptId', 'Укажите владельца ВНД')
+  if (!document.responsible?.trim()) add('responsible', 'Укажите ответственного')
 
   if (document.adoptedAt && document.publishedAt && document.publishedAt < document.adoptedAt) {
-    errors.push('Дата публикации не может быть раньше даты принятия')
+    add('publishedAt', 'Дата публикации не может быть раньше даты принятия')
   }
 
   const revisions = document.revisions ?? []
-  if (!revisions.some((revision) => revision.file)) errors.push('Приложите основной файл')
+  if (!revisions.some((revision) => revision.file)) add('root.mainFile', 'Приложите основной файл')
 
   if (hasPeriodOverlap(revisions) && !document.overlapConfirmed) {
-    errors.push('Периоды редакций пересекаются. Подтвердите пересечение или исправьте даты')
+    add('overlapConfirmed', 'Периоды редакций пересекаются. Подтвердите пересечение или исправьте даты')
   }
 
-  revisions.forEach((revision) => {
+  revisions.forEach((revision, index) => {
     const title = `Редакция ${revision.number || 'без номера'}`
     if (revision.effectiveFrom && revision.effectiveTo && revision.effectiveTo < revision.effectiveFrom) {
-      errors.push(`${title}: дата окончания раньше начала`)
+      add(`revisions.${index}.effectiveTo`, `${title}: дата окончания раньше начала`)
     }
     const incomplete = revision.incomplete && revision.incompleteReason?.trim()
     if ((!revision.confirmedStart || !revision.effectiveFrom) && !incomplete) {
-      errors.push(`${title}: без подтверждённого начала действия нужна отметка неполноты и причина`)
+      add(`revisions.${index}.incompleteReason`, `${title}: без подтверждённого начала действия нужна отметка неполноты и причина`)
     }
     if (!incomplete) {
-      if (!revision.file) errors.push(`${title}: нет основного файла`)
-      if (!revision.basisFile) errors.push(`${title}: нет файла основания`)
+      if (!revision.file) add(`revisions.${index}.file`, `${title}: нет основного файла`)
+      if (!revision.basisFile) add(`revisions.${index}.basisFile`, `${title}: нет файла основания`)
     }
-    if (revision.file) errors.push(...fileProblems(revision.file))
-    if (revision.basisFile) errors.push(...fileProblems(revision.basisFile))
+    if (revision.file) fileProblems(revision.file).forEach((message) => add(`revisions.${index}.file`, message))
+    if (revision.basisFile) fileProblems(revision.basisFile).forEach((message) => add(`revisions.${index}.basisFile`, message))
   })
 
   if (publishedDatesChanged(previous, document) && !dateChangeConfirmed) {
-    errors.push('Исправление опубликованной даты нужно подтвердить')
+    add('root.dateChangeConfirmed', 'Исправление опубликованной даты нужно подтвердить')
   }
 
-  return errors
+  return issues
+}
+
+export function validatePublication(document, options) {
+  return publicationIssues(document, options).map((issue) => issue.message)
 }

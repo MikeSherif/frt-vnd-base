@@ -9,6 +9,9 @@ export function Select({
   multiple = false,
   placeholder = 'Не выбрано',
   ariaLabel,
+  labelledBy,
+  describedBy,
+  invalid = false,
   disabled = false,
   clearable = false,
   compact = false,
@@ -43,12 +46,15 @@ export function Select({
 
   return (
     <div className={[styles.root, compact ? styles.compact : '', open ? styles.open : ''].filter(Boolean).join(' ')} ref={rootRef}>
-      <div className={styles.control}>
+      <div className={[styles.control, invalid ? styles.invalid : ''].filter(Boolean).join(' ')}>
         <button
           type="button"
           className={styles.face}
           disabled={disabled}
-          aria-label={ariaLabel}
+          aria-label={labelledBy ? undefined : ariaLabel}
+          aria-labelledby={labelledBy}
+          aria-describedby={describedBy}
+          aria-invalid={invalid || undefined}
           aria-haspopup="listbox"
           aria-expanded={open}
           aria-controls={listId}

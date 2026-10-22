@@ -4,12 +4,19 @@
   gap: 6px;
   font-size: 14px;
 }
-.field span { color: var(--vnd-muted); }
-.field input, .field select, .field textarea {
+.label { color: var(--vnd-muted); }
+.field > input,
+.field > select,
+.field > textarea {
   width: 100%;
   border: 1px solid var(--vnd-line);
   background: white;
   border-radius: 8px;
   padding: 8px 10px;
 }
-.field small { color: var(--vnd-muted); }
+.field > input[aria-invalid='true'],
+.field > textarea[aria-invalid='true'] {
+  border-color: var(--vnd-danger);
+}
+.hint { color: var(--vnd-muted); }
+.error { color: var(--vnd-danger); }

@@ -1,3 +1,4 @@
+import { FormProvider } from 'react-hook-form'
 import { DocumentForm } from '../../../widgets/document-form'
 import { PublishDocument } from '../../../features/publish-document'
 import { PageFrame, vndCrumbs } from '../../../shared/page-frame'
@@ -23,21 +24,24 @@ export function AdminPage() {
 
   return (
     <PageFrame crumbs={[...vndCrumbs(), { label: form.published ? 'Карточка ВНД' : 'Новый ВНД' }]}>
-      <div className={styles.page}>
-        <h2>{form.published ? 'Карточка ВНД' : 'Новый ВНД'}</h2>
-      <DocumentForm value={form.draft} documents={form.documents} onChange={form.setDraft} />
-      <PublishDocument
-        published={form.published}
-        errors={form.errors}
-        warnings={form.warnings}
-        notice={form.notice}
-        dateChangeNeeded={form.dateChangeNeeded}
-        dateChangeConfirmed={form.dateChangeConfirmed}
-        onDateChangeConfirmed={form.setDateChangeConfirmed}
-        onSaveDraft={form.saveDraft}
-        onPublish={form.publish}
-      />
-      </div>
+      <FormProvider {...form.methods}>
+        <div className={styles.page}>
+          <h2>{form.published ? 'Карточка ВНД' : 'Новый ВНД'}</h2>
+          <DocumentForm documents={form.documents} />
+          <PublishDocument
+            published={form.published}
+            errors={form.errors}
+            warnings={form.warnings}
+            notice={form.notice}
+            dateChangeNeeded={form.dateChangeNeeded}
+            dateChangeConfirmed={form.dateChangeConfirmed}
+            dateError={form.dateError}
+            onDateChangeConfirmed={form.setDateChangeConfirmed}
+            onSaveDraft={form.saveDraft}
+            onPublish={form.publish}
+          />
+        </div>
+      </FormProvider>
     </PageFrame>
   )
 }

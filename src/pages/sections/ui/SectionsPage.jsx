@@ -1,12 +1,13 @@
 import { Link } from 'react-router-dom'
-import { getMetrics } from '../../../entities/document'
+import { useMetrics } from '../../../entities/document'
 import { PageFrame } from '../../../shared/page-frame'
 import { sectionTiles } from '../model/sectionTiles.js'
 import { SectionIcon } from './SectionIcon.jsx'
 import styles from './SectionsPage.module.css'
 
 export function SectionsPage() {
-  const tiles = sectionTiles(getMetrics().total)
+  const { data: metrics } = useMetrics()
+  const tiles = sectionTiles(metrics?.total ?? 0)
   return (
     <PageFrame>
       <div className={styles.grid}>
