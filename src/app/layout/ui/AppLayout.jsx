@@ -1,3 +1,4 @@
+import { Suspense } from 'react'
 import { Outlet } from 'react-router-dom'
 import { RoleSwitch } from '../../../entities/session'
 import { useResetPortal } from '../model/resetPortalDemo.js'
@@ -12,7 +13,9 @@ export function AppLayout() {
         <button type="button" onClick={resetPortal}>Сбросить демо-данные</button>
       </div>
       <main className={styles.main}>
-        <Outlet />
+        <Suspense fallback={<p className={styles.loading}>Загрузка…</p>}>
+          <Outlet />
+        </Suspense>
       </main>
     </div>
   )
